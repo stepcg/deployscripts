@@ -75,12 +75,26 @@ rm "${BASEDIR}/pve-base.squashfs"
 cat << 'EOF' > "${ROOTFS}/${STAGE1}"
 #!/bin/bash
 
-# Make sure we're set to DHCP
-cp /etc/network/interfaces /etc/network/interfaces.bak
-grep -v $'\taddress ' /etc/network/interfaces.bak | grep -v $'\tgateway ' | sed 's/iface vmbr0 inet static/iface vmbr0 inet dhcp/' > /etc/network/interfaces
-rm /etc/network/interfaces.bak
-# Sometimes only IPv6 gets detected and we need to switch that to IPv4
-sed -i 's/iface vmbr0 inet6 static/iface vmbr0 inet dhcp/' /etc/network/interfaces
+# Reconfigure the network to bond all interfaces as active/passive and DHCP
+# Find all wired interfaces
+INTERFACES=($(ip link | grep -E '^[0-9]+: (eth|en|em|p|eno|ens|enp|eno|enx)' | awk '{print substr($2, 1, length($2)-1)}'))
+
+# Start the config with the loopback info
+NETCONFIG="auto lo\niface lo inet loopback\n\n"
+
+# "iface eth0 inet manual" type entries for each interface
+for INTERFACE in "${INTERFACES[@]}"; do
+	NETCONFIG+="iface ${INTERFACE} inet manaul\n"
+done
+
+# Add the bond and vmbr0
+NETCONFIG+="\nauto bond0\niface bond0 inet manual\n\tbond-slaves"
+for INTERFACE in "${INTERFACES[@]}"; do
+	NETCONFIG+=" ${INTERFACE}"
+done
+NETCONFIG+="\n\tbond-mimon 100\n\tbond-mode active-backup\n\tpost-up echo 100 > /sys/class/net/bond0/bonding/miimon\n\nauto vmbr0\niface vmbr0 inet dhcp\n\tbridge-ports bond0\n\tbridge-stp off\n\tbridge-fd 0\n"
+
+echo -e "${NETCONFIG}" > /etc/network/interfaces
 systemctl restart networking
 
 echo "Waiting for default route..."
