@@ -9,6 +9,8 @@
 # Script variables
 # The password as encrypted in /etc/shadow
 PASSWORD='$y$j9T$h..kRJ8t1N.BvqSVwFbCz.$oQPkVsHO5dtXQlqN3IMKGYeg1o4.wIaT8husYlOs76B:19884:0:99999:7:::'
+# Fix some binary path issues from crontab's lack of env vars
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Wait for system to be ready
 until systemd-analyze | grep -q "Startup finished in"; do
@@ -17,8 +19,8 @@ until systemd-analyze | grep -q "Startup finished in"; do
 done
 
 # Create the stepcg user in linux PAM and then add it to the proxmox gui administrators
-useradd -m -s /bin/bash stepcg
-usermod -aG sudo stepcg
+/usr/sbin/useradd -m -s /bin/bash stepcg
+/usl/sbin/usermod -aG sudo stepcg
 pveum useradd stepcg@pam -comment "StepCG User"
 pveum aclmod / -user stepcg@pam -role Administrator
 
@@ -39,6 +41,9 @@ wget -qO- https://raw.githubusercontent.com/foundObjects/pve-nag-buster/master/i
 apt-get update
 apt-get upgrade -y
 pveam update
+
+# Install sudo
+apt-get install sudo
 
 # Grab the latest Ubuntu 24.04 container template
 pveam download local $(pveam available | grep ubuntu-24.04-standard | awk '/^system/ {print $2}')
@@ -72,3 +77,6 @@ sysctl -p
 
 # Clear out the boot time script
 rm -f /root/proxmox-autoinstall-stage1.sh /etc/cron.d/proxmox-autoinstall-stage1
+
+# Reboot
+/usr/sbin/reboot
