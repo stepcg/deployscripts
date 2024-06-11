@@ -70,6 +70,3 @@ EOF
 
 # Clear out the boot time script
 rm -f /root/proxmox-autoinstall-stage1.sh /etc/cron.d/proxmox-autoinstall-stage1
-
-# Reboot to apply everything
-reboot
