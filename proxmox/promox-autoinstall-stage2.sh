@@ -2,6 +2,12 @@
 # The password as encrypted in /etc/shadow
 PASSWORD='$y$j9T$h..kRJ8t1N.BvqSVwFbCz.$oQPkVsHO5dtXQlqN3IMKGYeg1o4.wIaT8husYlOs76B:19884:0:99999:7:::'
 
+# Wait for system to be ready
+until systemd-analyze | grep -q "Startup finished in"; do
+	echo "Waiting for system to finish booting..."
+	sleep 1
+done
+
 # Create the stepcg user in linux PAM and then add it to the proxmox gui administrators
 useradd -m -s /bin/bash stepcg
 usermod -aG sudo stepcg
