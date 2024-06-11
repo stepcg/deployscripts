@@ -1,3 +1,11 @@
+#!/bin/bash
+#┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+#│                                 Proxmox Autoinstall Stage 2                                  │
+#├──────────────────────────────────────────────────────────────────────────────────────────────┤
+#│ Sets up the base proxmox host with some users and sane defaults. Runs updates and configrues │
+#│ for free tier. Can be reconfigured to chainload further stages as well.                      │
+#└──────────────────────────────────────────────────────────────────────────────────────────────┘
+
 # Script variables
 # The password as encrypted in /etc/shadow
 PASSWORD='$y$j9T$h..kRJ8t1N.BvqSVwFbCz.$oQPkVsHO5dtXQlqN3IMKGYeg1o4.wIaT8husYlOs76B:19884:0:99999:7:::'
