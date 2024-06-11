@@ -79,6 +79,8 @@ cat << 'EOF' > "${ROOTFS}/${STAGE1}"
 cp /etc/network/interfaces /etc/network/interfaces.bak
 grep -v $'\taddress ' /etc/network/interfaces.bak | grep -v $'\tgateway ' | sed 's/iface vmbr0 inet static/iface vmbr0 inet dhcp/' > /etc/network/interfaces
 rm /etc/network/interfaces.bak
+# Sometimes only IPv6 gets detected and we need to switch that to IPv4
+sed -i 's/iface vmbr0 inet6 static/iface vmbr0 inet dhcp/' /etc/network/interfaces
 systemctl restart networking
 
 echo "Waiting for default route..."
