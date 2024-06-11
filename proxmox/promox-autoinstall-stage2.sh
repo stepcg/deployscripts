@@ -67,6 +67,8 @@ net.ipv6.conf.all.accept_ra = 2
 net.ipv6.conf.default.accept_ra = 2
 net.ipv6.conf.vmbr0.accept_ra = 2
 EOF
+# Apply
+sysctl -p
 
 # Clear out the boot time script
 rm -f /root/proxmox-autoinstall-stage1.sh /etc/cron.d/proxmox-autoinstall-stage1
