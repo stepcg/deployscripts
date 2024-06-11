@@ -19,8 +19,8 @@ until systemd-analyze | grep -q "Startup finished in"; do
 done
 
 # Create the stepcg user in linux PAM and then add it to the proxmox gui administrators
-/usr/sbin/useradd -m -s /bin/bash stepcg
-/usl/sbin/usermod -aG sudo stepcg
+useradd -m -s /bin/bash stepcg
+usermod -aG sudo stepcg
 pveum useradd stepcg@pam -comment "StepCG User"
 pveum aclmod / -user stepcg@pam -role Administrator
 
@@ -79,4 +79,4 @@ sysctl -p
 rm -f /root/proxmox-autoinstall-stage1.sh /etc/cron.d/proxmox-autoinstall-stage1
 
 # Reboot
-/usr/sbin/reboot
+reboot
