@@ -75,6 +75,12 @@ rm "${BASEDIR}/pve-base.squashfs"
 cat << 'EOF' > "${ROOTFS}/${STAGE1}"
 #!/bin/bash
 
+# Make sure we're set to DHCP
+cp /etc/network/interfaces /etc/network/interfaces.bak
+grep -v $'\taddress ' /etc/network/interfaces.bak | grep -v $'\tgateway ' | sed 's/iface vmbr0 inet static/iface vmbr0 inet dhcp/' > /etc/network/interfaces
+rm /etc/network/interfaces.bak
+systemctl restart networking
+
 echo "Waiting for default route..."
 while [ $(ip route | grep default | wc -l) -eq 0 ]; do
 	sleep 1
